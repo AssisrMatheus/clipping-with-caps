@@ -1,9 +1,11 @@
-/**
-* @author Tim Knip / http://www.floorplanner.com/ / tim at floorplanner.com
-* @author Tony Parisi / http://www.tonyparisi.com/
-*/
+import * as THREE from '../lib/three';
 
-THREE.ColladaLoader = function () {
+/**
+ * @author Tim Knip / http://www.floorplanner.com/ / tim at floorplanner.com
+ * @author Tony Parisi / http://www.tonyparisi.com/
+ */
+
+export default function ColladaLoader() {
 
 	var COLLADA = null;
 	var scene = null;
@@ -429,9 +431,9 @@ THREE.ColladaLoader = function () {
 			var daeGeometry = geometries[ target_id ];
 
 			if ( !daeGeometry.mesh ||
-				 !daeGeometry.mesh.primitives ||
-				 !daeGeometry.mesh.primitives.length ) {
-				 continue;
+				!daeGeometry.mesh.primitives ||
+				!daeGeometry.mesh.primitives.length ) {
+				continue;
 			}
 
 			var target = daeGeometry.mesh.primitives[ 0 ].geometry;
@@ -1073,7 +1075,7 @@ THREE.ColladaLoader = function () {
 
 						var second = controllers[ controller.skin.source ];
 						morphController = second;
-					//	skinController = node.controllers[i];
+						//	skinController = node.controllers[i];
 
 						if ( second.morph && geometries[ second.morph.source ] ) {
 
@@ -1182,7 +1184,7 @@ THREE.ColladaLoader = function () {
 				if ( num_materials > 1 ) {
 
 					material = new THREE.MultiMaterial( used_materials_array );
-					
+
 					for ( j = 0; j < geom.faces.length; j ++ ) {
 
 						var face = geom.faces[ j ];
@@ -1260,7 +1262,7 @@ THREE.ColladaLoader = function () {
 			var cparams = cameras[instance_camera.url];
 
 			var cam = new THREE.PerspectiveCamera(cparams.yfov, parseFloat(cparams.aspect_ratio),
-					parseFloat(cparams.znear), parseFloat(cparams.zfar));
+				parseFloat(cparams.znear), parseFloat(cparams.zfar));
 
 			obj.add(cam);
 		}
@@ -3379,7 +3381,7 @@ THREE.ColladaLoader = function () {
 
 		var param = this.accessor.params[ 0 ];
 
-			//console.log(param.name + " " + param.type);
+		//console.log(param.name + " " + param.type);
 
 		switch ( param.type ) {
 
@@ -3677,7 +3679,7 @@ THREE.ColladaLoader = function () {
 			'emission':'emissionMap',
 			'bump':'bumpMap',
 			'normal':'normalMap'
-			};
+		};
 
 		for ( var prop in this ) {
 
@@ -5409,7 +5411,7 @@ THREE.ColladaLoader = function () {
 			data[4], data[5], data[6], data[7],
 			data[8], data[9], data[10], data[11],
 			data[12], data[13], data[14], data[15]
-			);
+		);
 
 	}
 

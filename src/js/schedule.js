@@ -1,19 +1,14 @@
-CAPS.SCHEDULE = {
-
+export default {
 	postpone: function ( callback, context, wait ) {
-
 		return function () {
 			setTimeout( function () {
 				callback.apply( context, arguments );
 			}, wait );
 		};
-
 	},
-
 	deferringThrottle: function ( callback, context, wait ) { // wait 60 = 16fps // wait 40 = 25fps // wait 20 = 50fps
-
-		var execute = function ( arguments ) {
-			callback.apply( context, arguments );
+		var execute = function ( ar ) {
+			callback.apply( context, ar );
 			setTimeout( function () {
 				if ( deferredCalls ) {
 					deferredCalls = false;
@@ -39,8 +34,6 @@ CAPS.SCHEDULE = {
 				execute( arguments );
 			}
 		};
-
 	}
-
 };
 

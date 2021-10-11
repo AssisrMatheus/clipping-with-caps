@@ -1,4 +1,5 @@
-// sets this vector to the coordinates of a mouse event, uses touch event if applicable
+import * as THREE from '../lib/three'
+
 THREE.Vector2.prototype.setFromEvent = function ( event ) {
 
 	this.x = ( event.clientX !== undefined ) ? event.clientX : ( event.touches && event.touches[ 0 ].clientX );

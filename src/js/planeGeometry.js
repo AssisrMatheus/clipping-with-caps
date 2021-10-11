@@ -1,4 +1,6 @@
-CAPS.PlaneGeometry = function ( v0, v1, v2, v3 ) {
+import * as THREE from '../lib/three';
+
+let PlaneGeometry = function ( v0, v1, v2, v3 ) {
 
 	THREE.Geometry.call( this );
 
@@ -11,6 +13,7 @@ CAPS.PlaneGeometry = function ( v0, v1, v2, v3 ) {
 
 };
 
-CAPS.PlaneGeometry.prototype = new THREE.Geometry();
-CAPS.PlaneGeometry.prototype.constructor = CAPS.PlaneGeometry;
+PlaneGeometry.prototype = new THREE.Geometry();
+PlaneGeometry.prototype.constructor = PlaneGeometry;
 
+export default PlaneGeometry;

@@ -1,5 +1,7 @@
-CAPS.picking = function ( simulation ) {
+import * as THREE from '../lib/three';
+import MATERIAL from './material';
 
+export default function picking( simulation ) {
 	var intersected = null;
 	var mouse = new THREE.Vector2();
 	var ray = new THREE.Raycaster();
@@ -13,23 +15,20 @@ CAPS.picking = function ( simulation ) {
 		z2: new THREE.Vector3(  0,  0,  1 )
 	};
 
-	var plane = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100, 4, 4 ), CAPS.MATERIAL.Invisible );
+	var plane = new THREE.Mesh( new THREE.PlaneGeometry( 100, 100, 4, 4 ), MATERIAL.Invisible );
 	simulation.scene.add( plane );
 
 	var targeting = function ( event ) {
-
 		mouse.setToNormalizedDeviceCoordinates( event, window );
 
-		ray.setFromCamera( mouse, simulation.camera );	
+		ray.setFromCamera( mouse, simulation.camera );
 
 		var intersects = ray.intersectObjects( simulation.selection.selectables );
 
 		if ( intersects.length > 0 ) {
-
 			var candidate = intersects[ 0 ].object;
 
 			if ( intersected !== candidate ) {
-
 				if ( intersected !== null ) {
 					intersected.guardian.rayOut();
 				}
@@ -40,31 +39,24 @@ CAPS.picking = function ( simulation ) {
 
 				simulation.renderer.domElement.style.cursor = 'pointer';
 				simulation.throttledRender();
-
 			}
-
 		} else if ( intersected !== null ) {
-
 			intersected.guardian.rayOut();
 			intersected = null;
 
 			simulation.renderer.domElement.style.cursor = 'auto';
 			simulation.throttledRender();
-
 		}
-
 	};
 
 	var beginDrag = function ( event ) {
-
 		mouse.setToNormalizedDeviceCoordinates( event, window );
 
-		ray.setFromCamera( mouse, simulation.camera );	
+		ray.setFromCamera( mouse, simulation.camera );
 
 		var intersects = ray.intersectObjects( simulation.selection.selectables );
 
 		if ( intersects.length > 0 ) {
-
 			event.preventDefault();
 			event.stopPropagation();
 
@@ -92,18 +84,17 @@ CAPS.picking = function ( simulation ) {
 			simulation.throttledRender();
 
 			var continueDrag = function ( event ) {
-
 				event.preventDefault();
 				event.stopPropagation();
 
 				mouse.setToNormalizedDeviceCoordinates( event, window );
 
-				ray.setFromCamera( mouse, simulation.camera );	
+				ray.setFromCamera( mouse, simulation.camera );
 
 				var intersects = ray.intersectObject( plane );
+				var value;
 
 				if ( intersects.length > 0 ) {
-
 					if ( axis === 'x1' || axis === 'x2' ) {
 						value = intersects[ 0 ].point.x;
 					} else if ( axis === 'y1' || axis === 'y2' ) {
@@ -114,13 +105,10 @@ CAPS.picking = function ( simulation ) {
 
 					simulation.selection.setValue( axis, value );
 					simulation.throttledRender();
-
 				}
-
 			};
 
 			var endDrag = function ( event ) {
-
 				simulation.controls.enabled = true;
 
 				simulation.renderer.domElement.style.cursor = 'pointer';
@@ -132,7 +120,6 @@ CAPS.picking = function ( simulation ) {
 				document.removeEventListener( 'touchend',    endDrag, false );
 				document.removeEventListener( 'touchcancel', endDrag, false );
 				document.removeEventListener( 'touchleave',  endDrag, false );
-
 			};
 
 			document.addEventListener( 'mousemove', continueDrag, true );
@@ -142,14 +129,11 @@ CAPS.picking = function ( simulation ) {
 			document.addEventListener( 'touchend',    endDrag, false );
 			document.addEventListener( 'touchcancel', endDrag, false );
 			document.addEventListener( 'touchleave',  endDrag, false );
-
 		}
-
 	};
 
 	simulation.renderer.domElement.addEventListener( 'mousemove',  targeting, true );
 	simulation.renderer.domElement.addEventListener( 'mousedown',  beginDrag, false );
 	simulation.renderer.domElement.addEventListener( 'touchstart', beginDrag, false );
-
 };
 

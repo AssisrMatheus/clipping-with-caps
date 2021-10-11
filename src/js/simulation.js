@@ -1,5 +1,12 @@
-CAPS.Simulation = function () {
+import * as THREE from '../lib/three';
+import ColladaLoader from "../lib/ColladaLoader";
+import Selection from "./selection";
+import SCHEDULE from "./schedule";
+import MATERIAL from "./material";
+import picking from "./picking";
+import OrbitControls from "../lib/OrbitControls"
 
+let Simulation = function () {
 	this.scene        = undefined;
 	this.capsScene    = undefined;
 	this.backStencil  = undefined;
@@ -12,20 +19,16 @@ CAPS.Simulation = function () {
 	this.showCaps = true;
 
 	this.init();
-
 };
 
-CAPS.Simulation.prototype = {
-
-	constructor: CAPS.Simulation,
-
+Simulation.prototype = {
+	constructor: Simulation,
 	init: function () {
-
 		var self = this;
 
-		var loader = new THREE.ColladaLoader();
+		var loader = new ColladaLoader();
 		loader.options.convertUpAxis = true;
-		loader.load( './models/house.dae', function ( collada ) {
+		loader.load( '/models/house.dae', function ( collada ) {
 			self.initScene( collada.scene );
 		} );
 
@@ -41,7 +44,7 @@ CAPS.Simulation.prototype = {
 		this.backStencil  = new THREE.Scene();
 		this.frontStencil = new THREE.Scene();
 
-		this.selection = new CAPS.Selection(
+		this.selection = new Selection(
 			new THREE.Vector3( -7, -14, -14 ),
 			new THREE.Vector3( 14,   9,   3 )
 		);
@@ -56,12 +59,12 @@ CAPS.Simulation.prototype = {
 		this.renderer.autoClear = false;
 		container.appendChild( this.renderer.domElement );
 
-		var throttledRender = CAPS.SCHEDULE.deferringThrottle( this._render, this, 40 );
+		var throttledRender = SCHEDULE.deferringThrottle( this._render, this, 10 );
 		this.throttledRender = throttledRender;
 
-		CAPS.picking( this ); // must come before OrbitControls, so it can cancel them
+		picking( this ); // must come before OrbitControls, so it can cancel them
 
-		this.controls = new THREE.OrbitControls( this.camera, this.renderer.domElement );
+		this.controls = new OrbitControls( this.camera, this.renderer.domElement );
 		this.controls.addEventListener( 'change', throttledRender );
 
 		var onWindowResize = function () {
@@ -83,9 +86,7 @@ CAPS.Simulation.prototype = {
 		throttledRender();
 
 	},
-
 	initScene: function ( collada ) {
-
 		var setMaterial = function ( node, material ) {
 			node.material = material;
 			if ( node.children ) {
@@ -96,34 +97,30 @@ CAPS.Simulation.prototype = {
 		};
 
 		var back = collada.clone();
-		setMaterial( back, CAPS.MATERIAL.backStencil );
+		setMaterial( back, MATERIAL.backStencil );
 		back.scale.set( 0.03, 0.03, 0.03 );
 		back.updateMatrix();
 		this.backStencil.add( back );
 
 		var front = collada.clone();
-		setMaterial( front, CAPS.MATERIAL.frontStencil );
+		setMaterial( front, MATERIAL.frontStencil );
 		front.scale.set( 0.03, 0.03, 0.03 );
 		front.updateMatrix();
 		this.frontStencil.add( front );
 
-		setMaterial( collada, CAPS.MATERIAL.sheet );
+		setMaterial( collada, MATERIAL.sheet );
 		collada.scale.set( 0.03, 0.03, 0.03 );
 		collada.updateMatrix();
 		this.scene.add( collada );
 
 		this.throttledRender();
-
 	},
-
 	_render: function () {
-
 		this.renderer.clear();
 
 		var gl = this.renderer.context;
 
 		if ( this.showCaps ) {
-
 			this.renderer.state.setStencilTest( true );
 
 			this.renderer.state.setStencilFunc( gl.ALWAYS, 1, 0xff );
@@ -139,12 +136,10 @@ CAPS.Simulation.prototype = {
 			this.renderer.render( this.capsScene, this.camera );
 
 			this.renderer.state.setStencilTest( false );
-
 		}
 
 		this.renderer.render( this.scene, this.camera );
-
 	}
-
 };
 
+export default Simulation;

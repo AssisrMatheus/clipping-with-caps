@@ -1,5 +1,4 @@
-CAPS.SHADER = {
-
+export default {
 	vertex: '\
 		uniform vec3 color;\
 		varying vec3 pixelNormal;\
@@ -128,6 +127,4 @@ CAPS.SHADER = {
 			gl_FragColor = vec4( 0.0, 0.0, 0.0, 1.0 );\
 			discard;\
 		}'
-
 };
-
