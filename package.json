@@ -19,9 +19,11 @@
     "serve": "serve dist"
   },
   "dependencies": {
-    "http-server": "^13.0.2"
+    "http-server": "^13.0.2",
+    "three": "^0.133.1"
   },
   "devDependencies": {
+    "@types/three": "^0.133.1",
     "css-loader": "^6.4.0",
     "html-webpack-plugin": "^5.3.2",
     "json5": "^2.2.0",

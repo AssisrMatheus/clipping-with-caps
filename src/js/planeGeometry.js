@@ -1,19 +1,20 @@
-import * as THREE from '../lib/three';
+import { Face3, Geometry } from "three/examples/jsm/deprecated/Geometry";
 
-let PlaneGeometry = function ( v0, v1, v2, v3 ) {
+class LegacyPlaneGeometry extends Geometry {
+	constructor(v0, v1, v2, v3) {
+		super();
 
-	THREE.Geometry.call( this );
+		this.vertices.push( v0, v1, v2, v3 );
+		this.faces.push( new Face3( 0, 1, 2 ) );
+		this.faces.push( new Face3( 0, 2, 3 ) );
 
-	this.vertices.push( v0, v1, v2, v3 );
-	this.faces.push( new THREE.Face3( 0, 1, 2 ) );
-	this.faces.push( new THREE.Face3( 0, 2, 3 ) );
+		this.computeFaceNormals();
+		this.computeVertexNormals();
+	}
+}
 
-	this.computeFaceNormals();
-	this.computeVertexNormals();
-
-};
-
-PlaneGeometry.prototype = new THREE.Geometry();
-PlaneGeometry.prototype.constructor = PlaneGeometry;
+function PlaneGeometry(v0,v1,v2,v3) {
+	return new LegacyPlaneGeometry(v0,v1,v2,v3).toBufferGeometry();
+}
 
 export default PlaneGeometry;

@@ -1,36 +1,29 @@
-import * as THREE from '../lib/three';
-import ColladaLoader from "../lib/ColladaLoader";
+import * as THREE from 'three';
 import Selection from "./selection";
 import SCHEDULE from "./schedule";
 import MATERIAL from "./material";
 import picking from "./picking";
-import OrbitControls from "../lib/OrbitControls"
+import { OrbitControls} from "three/examples/jsm/controls/OrbitControls";
+import { ColladaLoader } from "three/examples/jsm/loaders/ColladaLoader";
 
-let Simulation = function () {
-	this.scene        = undefined;
-	this.capsScene    = undefined;
-	this.backStencil  = undefined;
-	this.frontStencil = undefined;
+class Simulation {
+	constructor() {
+		this.scene        = undefined;
+		this.capsScene    = undefined;
+		this.backStencil  = undefined;
+		this.frontStencil = undefined;
 
-	this.camera   = undefined;
-	this.renderer = undefined;
-	this.controls = undefined;
+		this.camera   = undefined;
+		this.renderer = undefined;
+		this.controls = undefined;
 
-	this.showCaps = true;
+		this.showCaps = true;
 
-	this.init();
-};
+		this.init();
+	}
 
-Simulation.prototype = {
-	constructor: Simulation,
-	init: function () {
+	init(){
 		var self = this;
-
-		var loader = new ColladaLoader();
-		loader.options.convertUpAxis = true;
-		loader.load( '/models/house.dae', function ( collada ) {
-			self.initScene( collada.scene );
-		} );
 
 		var container = document.createElement( 'div' );
 		document.body.appendChild( container );
@@ -62,6 +55,14 @@ Simulation.prototype = {
 		var throttledRender = SCHEDULE.deferringThrottle( this._render, this, 10 );
 		this.throttledRender = throttledRender;
 
+		// Dirty fix for convertUpAxis that is not available anymore. https://github.com/mrdoob/three.js/issues/12888#issuecomment-359842246
+		new THREE.FileLoader().load( '/models/house.dae', function ( text ) {
+			text = text.replace( '<up_axis>Z_UP</up_axis>', '<up_axis>Y_UP</up_axis>' );
+
+			var collada = new ColladaLoader().parse( text );
+			self.initScene( collada.scene );
+		} );
+
 		picking( this ); // must come before OrbitControls, so it can cancel them
 
 		this.controls = new OrbitControls( this.camera, this.renderer.domElement );
@@ -84,9 +85,9 @@ Simulation.prototype = {
 		showCapsInput.addEventListener( 'change', onShowCaps, false );
 
 		throttledRender();
+	}
 
-	},
-	initScene: function ( collada ) {
+	initScene( collada ) {
 		var setMaterial = function ( node, material ) {
 			node.material = material;
 			if ( node.children ) {
@@ -114,32 +115,33 @@ Simulation.prototype = {
 		this.scene.add( collada );
 
 		this.throttledRender();
-	},
-	_render: function () {
+	}
+
+	_render() {
 		this.renderer.clear();
 
-		var gl = this.renderer.context;
+		var gl = this.renderer.getContext();
 
-		if ( this.showCaps ) {
-			this.renderer.state.setStencilTest( true );
-
-			this.renderer.state.setStencilFunc( gl.ALWAYS, 1, 0xff );
-			this.renderer.state.setStencilOp( gl.KEEP, gl.KEEP, gl.INCR );
-			this.renderer.render( this.backStencil, this.camera );
-
-			this.renderer.state.setStencilFunc( gl.ALWAYS, 1, 0xff );
-			this.renderer.state.setStencilOp( gl.KEEP, gl.KEEP, gl.DECR );
-			this.renderer.render( this.frontStencil, this.camera );
-
-			this.renderer.state.setStencilFunc( gl.EQUAL, 1, 0xff );
-			this.renderer.state.setStencilOp( gl.KEEP, gl.KEEP, gl.KEEP );
-			this.renderer.render( this.capsScene, this.camera );
-
-			this.renderer.state.setStencilTest( false );
-		}
+		// if ( this.showCaps ) {
+		// 	this.renderer.state.setStencilTest( true );
+		//
+		// 	this.renderer.state.setStencilFunc( gl.ALWAYS, 1, 0xff );
+		// 	this.renderer.state.setStencilOp( gl.KEEP, gl.KEEP, gl.INCR );
+		// 	this.renderer.render( this.backStencil, this.camera );
+		//
+		// 	this.renderer.state.setStencilFunc( gl.ALWAYS, 1, 0xff );
+		// 	this.renderer.state.setStencilOp( gl.KEEP, gl.KEEP, gl.DECR );
+		// 	this.renderer.render( this.frontStencil, this.camera );
+		//
+		// 	this.renderer.state.setStencilFunc( gl.EQUAL, 1, 0xff );
+		// 	this.renderer.state.setStencilOp( gl.KEEP, gl.KEEP, gl.KEEP );
+		// 	this.renderer.render( this.capsScene, this.camera );
+		//
+		// 	this.renderer.state.setStencilTest( false );
+		// }
 
 		this.renderer.render( this.scene, this.camera );
 	}
-};
+}
 
 export default Simulation;

@@ -1,6 +1,4 @@
 import './css/caps.css';
-import './lib/ColladaLoader';
-import './lib/OrbitControls';
 
 import './js/threeExtensions';
 
